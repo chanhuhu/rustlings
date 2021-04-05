@@ -6,8 +6,9 @@
 
 fn main() {
     let vec0 = Vec::new();
+    let copy_vec = vec0.to_vec();
 
-    let mut vec1 = fill_vec(vec0);
+    let mut vec1 = fill_vec(copy_vec);
 
     // Do not change the following line!
     println!("{} has length {} content `{:?}`", "vec0", vec0.len(), vec0);
