@@ -10,9 +10,10 @@
 // I AM NOT DONE
 
 fn vec_loop(mut v: Vec<i32>) -> Vec<i32> {
-    for i in v.iter_mut() {
+    for (_, v) in v.iter_mut().enumerate() {
         // TODO: Fill this up so that each element in the Vec `v` is
         // multiplied by 2.
+        *v *= 2
     }
 
     // At this point, `v` should be equal to [4, 8, 12, 16, 20].
