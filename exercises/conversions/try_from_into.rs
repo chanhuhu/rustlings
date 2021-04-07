@@ -11,7 +11,6 @@ struct Color {
     blue: u8,
 }
 
-// I AM NOT DONE
 
 // Your task is to complete this implementation
 // and return an Ok result of inner type Color.
@@ -22,22 +21,84 @@ struct Color {
 // but the slice implementation needs to check the slice length!
 // Also note that correct RGB color values must be integers in the 0..=255 range.
 
+const MAX: i16 = 255;
+const MIN: i16 = 0;
+
+
 // Tuple implementation
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = String;
-    fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {}
+    fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        // inclusive check that rbg color is 8 bits
+        if !(tuple.0 >= MIN && tuple.0 <= MAX) {
+            return Err(format!("Failed to convert Color from {} tuple must in range 0..255", tuple.0));
+        }
+        if !(tuple.1 >= MIN && tuple.1 <= MAX) {
+            return Err(format!("Failed to convert Color from {} tuple must in range 0..255", tuple.1));
+        }
+        if !(tuple.2 >= MIN && tuple.2 <= MAX) {
+            return Err(format!("Failed to convert Color from {} tuple must in range 0..255", tuple.2));
+        }
+
+        Ok(Color {
+            red: tuple.0 as u8,
+            green: tuple.1 as u8,
+            blue: tuple.2 as u8,
+        })
+    }
 }
 
 // Array implementation
 impl TryFrom<[i16; 3]> for Color {
     type Error = String;
-    fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {}
+    fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        // inclusive check that rbg color is 8 bits
+        if !(arr[0] >= MIN && arr[0] <= MAX) {
+            return Err(format!("Failed to convert Color from {} element of an array must in range 0..255", arr[0]));
+        }
+        if !(arr[1] >= MIN && arr[1] <= MAX) {
+            return Err(format!("Failed to convert Color from {} element of an array must in range 0..255", arr[1]));
+        }
+        if !(arr[2] >= MIN && arr[2] <= MAX) {
+            return Err(format!("Failed to convert Color from {} element of an array must in range 0..255", arr[2]));
+        }
+        Ok(
+            Color {
+                red: arr[0] as u8,
+                green: arr[1] as u8,
+                blue: arr[2] as u8
+            }
+        )
+    }
 }
 
 // Slice implementation
 impl TryFrom<&[i16]> for Color {
     type Error = String;
-    fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {}
+    fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            return Err("Expected length 3 slice".to_string())
+        }
+        for value in slice {
+            if !(value >= &MIN && value <= &MAX) {
+                return Err(format!("Failed to convert Color from {} element of a slice must in range 0..255", value));
+            }
+            if !(value >= &MIN && value <= &MAX) {
+                return Err(format!("Failed to convert Color from {} element of a slice must in range 0..255", value));
+            }
+            if !(value >= &MIN && value <= &MAX) {
+                return Err(format!("Failed to convert Color from {} element of a slice must in range 0..255", value));
+            }
+
+            // vec.push(value)
+        }
+
+        Ok(Color {
+            red:   slice[0] as u8,
+            green: slice[1] as u8,
+            blue:  slice[2] as u8
+        })
+    }
 }
 
 fn main() {
@@ -66,14 +127,17 @@ mod tests {
     fn test_tuple_out_of_range_positive() {
         assert!(Color::try_from((256, 1000, 10000)).is_err());
     }
+
     #[test]
     fn test_tuple_out_of_range_negative() {
         assert!(Color::try_from((-1, -10, -256)).is_err());
     }
+
     #[test]
     fn test_tuple_sum() {
         assert!(Color::try_from((-1, 255, 255)).is_err());
     }
+
     #[test]
     fn test_tuple_correct() {
         let c: Result<Color, String> = (183, 65, 14).try_into();
@@ -82,25 +146,29 @@ mod tests {
             Ok(Color {
                 red: 183,
                 green: 65,
-                blue: 14
+                blue: 14,
             })
         );
     }
+
     #[test]
     fn test_array_out_of_range_positive() {
         let c: Result<Color, String> = [1000, 10000, 256].try_into();
         assert!(c.is_err());
     }
+
     #[test]
     fn test_array_out_of_range_negative() {
         let c: Result<Color, String> = [-10, -256, -1].try_into();
         assert!(c.is_err());
     }
+
     #[test]
     fn test_array_sum() {
         let c: Result<Color, String> = [-1, 255, 255].try_into();
         assert!(c.is_err());
     }
+
     #[test]
     fn test_array_correct() {
         let c: Result<Color, String> = [183, 65, 14].try_into();
@@ -109,25 +177,29 @@ mod tests {
             Ok(Color {
                 red: 183,
                 green: 65,
-                blue: 14
+                blue: 14,
             })
         );
     }
+
     #[test]
     fn test_slice_out_of_range_positive() {
         let arr = [10000, 256, 1000];
         assert!(Color::try_from(&arr[..]).is_err());
     }
+
     #[test]
     fn test_slice_out_of_range_negative() {
         let arr = [-256, -1, -10];
         assert!(Color::try_from(&arr[..]).is_err());
     }
+
     #[test]
     fn test_slice_sum() {
         let arr = [-1, 255, 255];
         assert!(Color::try_from(&arr[..]).is_err());
     }
+
     #[test]
     fn test_slice_correct() {
         let v = vec![183, 65, 14];
@@ -137,15 +209,17 @@ mod tests {
             Ok(Color {
                 red: 183,
                 green: 65,
-                blue: 14
+                blue: 14,
             })
         );
     }
+
     #[test]
     fn test_slice_excess_length() {
         let v = vec![0, 0, 0, 0];
         assert!(Color::try_from(&v[..]).is_err());
     }
+
     #[test]
     fn test_slice_insufficient_length() {
         let v = vec![0, 0];

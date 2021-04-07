@@ -10,7 +10,6 @@ struct Person {
     age: usize,
 }
 
-// I AM NOT DONE
 
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
@@ -25,6 +24,32 @@ struct Person {
 impl FromStr for Person {
     type Err = String;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        if s.len() == 0 {
+            return  Err("Error not accept empty str".to_string())
+        }
+
+        let parts = s.split(',').collect::<Vec<&str>>();
+
+        if parts.len() != 2 {
+            return Err("Only 2 element should return from split".to_string())
+        }
+
+        let name = parts[0];
+
+        if name.trim() == "" {
+            return Err("Not accept empty name".to_string())
+        }
+
+        let age = parts[1];
+
+        match age.parse::<usize>() {
+            Ok(age) => Ok(Person {
+                name: name.to_string(),
+                age
+            }),
+            Err(e) => Err(format!("Failed to parse age to usize error {}", e))
+        }
+
     }
 }
 
